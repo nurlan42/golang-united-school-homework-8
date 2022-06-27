@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -85,7 +86,12 @@ func TestListOperation(t *testing.T) {
 	var buffer bytes.Buffer
 
 	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, filePermission)
-	defer os.Remove(fileName)
+	defer func() {
+		err := os.Remove(fileName)
+		if err != nil {
+			fmt.Println("err===========", err)
+		}
+	}()
 	if err != nil {
 		t.Error(err)
 	}
@@ -105,7 +111,7 @@ func TestListOperation(t *testing.T) {
 		t.Error(err)
 	}
 	defer file.Close()
-	
+
 	bytes, err := ioutil.ReadAll(file)
 	if err != nil {
 		t.Error(err)
@@ -351,7 +357,6 @@ func TestRemovingOperationWrongID(t *testing.T) {
 		"fileName":  fileName,
 	}
 	err = Perform(args, &buffer)
-
 	if err != nil {
 		t.Error(err)
 	}
